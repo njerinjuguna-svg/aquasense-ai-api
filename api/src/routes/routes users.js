@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/model users');
-const jwt = require('jsonwebtoken'); // <-- Kept exactly where you want it!
+const jwt = require('jsonwebtoken'); // <-- Kept exactly at the top of the route
 const bcrypt = require('bcryptjs');
 
-// STEP 1: REGISTER (Securely hashes password and creates user)
+// STEP 1: REGISTER (Securely hashes password and maps fields)
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password, full_name, organization_type } = req.body;
@@ -12,12 +12,13 @@ router.post('/register', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
+        // Maps the incoming snake_case parameters cleanly to your database model attributes
         const newUser = await User.create({
             username, 
             email, 
             password: hashedPassword, 
-            full_name, 
-            organization_type
+            full_name: full_name,             // Maps to database field names
+            organization_type: organization_type
         });
         
         res.status(201).json({ message: 'User created', userId: newUser.id });
@@ -26,13 +27,20 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// STEP 2: LOGIN (Credentials Check & OTP Generation)
+// STEP 2: LOGIN (Credentials Verification & OTP Generation)
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ where: { email } });
 
-        if (user && (await user.matchPassword(password))) {
+        if (!user) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+        // Direct bcrypt verification completely avoids reliance on external model prototype methods
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (isMatch) {
             const otp = Math.floor(100000 + Math.random() * 900000).toString();
             const expires = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -44,13 +52,14 @@ router.post('/login', async (req, res) => {
 
             return res.status(200).json({ message: "OTP generated. Check terminal." });
         }
+        
         res.status(401).json({ message: "Invalid email or password" });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
 
-// STEP 3: VERIFY OTP (Uses jwt to sign and return the login token)
+// STEP 3: VERIFY OTP (Validates temporary code and mints production JWT access token)
 router.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
@@ -61,7 +70,7 @@ router.post('/verify-otp', async (req, res) => {
             user.otpExpires = null;
             await user.save();
 
-            // Uses the jwt variable imported on Line 4
+            // Uses the top-level jwt import variable
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
             res.status(200).json({ message: "Login verified!", token });
