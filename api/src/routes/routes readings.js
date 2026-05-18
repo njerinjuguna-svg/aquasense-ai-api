@@ -4,9 +4,6 @@ const router = express.Router();
 const readingController = require('../controllers/readingController'); 
 const  protect  = require('../middleware/authMiddleware'); // 1. Import the security guard
 
-console.log("READINGS FILE CHECK:");
-console.log("Is protect a function?", typeof protect);
-console.log("Is readingController defined?", typeof readingController);
 // Add a check for whatever your controller functions are named here, for example:
 console.log("Is postReading a function?", typeof readingController?.postReading); 
 console.log("Is getReadings a function?", typeof readingController?.getReadings);

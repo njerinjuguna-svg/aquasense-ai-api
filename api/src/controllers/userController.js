@@ -2,7 +2,7 @@ const User = require('../models/model users');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-exports.registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
     try {
         const { username, email, password, full_name, organization_type } = req.body;
         const salt = await bcrypt.genSalt(10);
@@ -16,7 +16,7 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ where: { email } });
@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.verifyOTP = async (req, res) => {
+const verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
         const user = await User.findOne({ where: { email, otp } });
@@ -52,7 +52,14 @@ exports.verifyOTP = async (req, res) => {
     }
 };
 
-// THIS IS THE ONE CRASHING YOUR ROUTE - MAKE SURE IT IS HERE
-exports.getUserProfile = async (req, res) => {
+const getUserProfile = async (req, res) => {
     res.json(req.user);
+};
+
+// Unified structural export block to cleanly bind endpoints to the router
+module.exports = {
+    registerUser,
+    login,
+    verifyOTP,
+    getUserProfile
 };

@@ -3,7 +3,29 @@ const router = express.Router();
 const User = require('../models/model users');
 const jwt = require('jsonwebtoken');
 
-// STEP 1: LOGIN (Credentials Check & OTP Generation)
+// STEP 1: REGISTER (Securely hashes password and creates user)
+router.post('/register', async (req, res) => {
+    try {
+        const { username, email, password, full_name, organization_type } = req.body;
+        
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        
+        const newUser = await User.create({
+            username, 
+            email, 
+            password: hashedPassword, 
+            full_name, 
+            organization_type
+        });
+        
+        res.status(201).json({ message: 'User created', userId: newUser.id });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// STEP 2: LOGIN (Credentials Check & OTP Generation)
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -27,7 +49,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// STEP 2: VERIFY OTP
+// STEP 3: VERIFY OTP (Uses jwt to sign and return the login token)
 router.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
@@ -38,6 +60,7 @@ router.post('/verify-otp', async (req, res) => {
             user.otpExpires = null;
             await user.save();
 
+            // Uses the jwt variable imported on Line 4
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
             res.status(200).json({ message: "Login verified!", token });
@@ -47,11 +70,6 @@ router.post('/verify-otp', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Verification error", error: error.message });
     }
-});
-
-// ADDING A DUMMY REGISTER ROUTE TO PREVENT CRASHES IF APP.JS CALLS IT
-router.post('/register', async (req, res) => {
-    res.status(200).json({ message: "Register route is active" });
 });
 
 module.exports = router;
