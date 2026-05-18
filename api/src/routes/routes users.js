@@ -104,16 +104,33 @@ router.post('/verify-otp', async (req, res) => {
 });
 
 // ==========================================
-// STEP 4: GET USER PROFILE
+// STEP 4: GET USER PROFILE (Adjusted for flexible middleware matching)
 // URL: GET https://aquasense-ai-api.onrender.com/api/users/profile
 // ==========================================
 router.get('/profile', protect, async (req, res) => {
     try {
-        // Since protect middleware attaches the user instance to req.user, we return it directly
-        if (!req.user) {
-            return res.status(404).json({ message: "User profile data not found" });
+        // 1. Check if the middleware attached the full user object under lowercase or capital names
+        let currentUser = req.user || req.User;
+
+        // 2. If the middleware only attached a userId, fetch the full user from the database directly
+        if (!currentUser && (req.userId || req.UserId)) {
+            const idToQuery = req.userId || req.UserId;
+            currentUser = await User.findByPk(idToQuery, {
+                attributes: { exclude: ['password', 'otp', 'otpExpires'] } // Hide sensitive fields
+            });
         }
-        res.status(200).json(req.user);
+
+        // 3. Fallback check if absolutely nothing was passed from the middleware
+        if (!currentUser) {
+            return res.status(404).json({ 
+                message: "User profile data not found. Check authMiddleware assignment keys.",
+                debugKeysReceived: Object.keys(req) // Helps us see exactly what your middleware is passing
+            });
+        }
+
+        // 4. Return the clean user profile object
+        res.status(200).json(currentUser);
+
     } catch (error) {
         res.status(500).json({ message: "Server error fetching profile", error: error.message });
     }
