@@ -4,21 +4,26 @@ const User = require('../models/model users');
 const jwt = require('jsonwebtoken'); // <-- Kept exactly at the top of the route
 const bcrypt = require('bcryptjs');
 
-// STEP 1: REGISTER (Securely hashes password and maps fields)
+// STEP 1: REGISTER (Checks duplicates, hashes password, and creates user)
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password, full_name, organization_type } = req.body;
         
+        // Check if a user with that email already exists to prevent database validation crashes
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ message: "A user with this email already exists" });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
-        // Maps the incoming snake_case parameters cleanly to your database model attributes
         const newUser = await User.create({
             username, 
             email, 
             password: hashedPassword, 
-            full_name: full_name,             // Maps to database field names
-            organization_type: organization_type
+            full_name, 
+            organization_type
         });
         
         res.status(201).json({ message: 'User created', userId: newUser.id });
@@ -37,7 +42,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
-        // Direct bcrypt verification completely avoids reliance on external model prototype methods
+        // Uses direct bcrypt comparison to match the registration password flow
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
@@ -59,7 +64,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// STEP 3: VERIFY OTP (Validates temporary code and mints production JWT access token)
+// STEP 3: VERIFY OTP
 router.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
