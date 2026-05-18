@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const sequelize = require('./config/database');
@@ -7,6 +8,7 @@ require('dotenv').config();
 const app = express();
 
 // MIDDLEWARE
+app.use(cors());
 app.use(helmet()); 
 app.use(express.json());
 
