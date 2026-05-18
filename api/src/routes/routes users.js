@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/model users');
-const jwt = require('jsonwebtoken'); // Kept right here at the top
+const jwt = require('jsonwebtoken'); // Kept at the top
 const bcrypt = require('bcryptjs');
 
-// STEP 1: REGISTER (Relies on model hooks to prevent double-hashing)
+// STEP 1: REGISTER (Checks duplicates and creates user)
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password, full_name, organization_type } = req.body;
@@ -15,11 +15,11 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: "A user with this email already exists" });
         }
 
-        // Pass the raw password directly. If your model hashes automatically, this prevents a double-hash crash.
+        // Pass raw password to let model hooks handle hashing safely
         const newUser = await User.create({
             username, 
             email, 
-            password: password, // Sending raw password to let model hooks run cleanly
+            password: password, 
             full_name, 
             organization_type
         });
@@ -30,7 +30,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// STEP 2: LOGIN (Robust fallbacks for both direct hashes and instance methods)
+// STEP 2: LOGIN (Credentials Check & Static OTP Setting)
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -46,19 +46,20 @@ router.post('/login', async (req, res) => {
         if (typeof user.matchPassword === 'function') {
             isMatch = await user.matchPassword(password);
         } else {
-            // Fallback Check 2: Direct bcrypt comparison against the database string
+            // Fallback Check 2: Direct bcrypt comparison
             isMatch = await bcrypt.compare(password, user.password);
         }
 
         if (isMatch) {
-            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+            // Hardcoded to '000000' for development ease
+            const otp = "000000";
             const expires = new Date(Date.now() + 10 * 60 * 1000);
 
             user.otp = otp;
             user.otpExpires = expires;
             await user.save();
 
-            console.log(`\n🔑 OTP FOR: ${email} -> ${otp}\n`);
+            console.log(`\n🔑 STATIC OTP FOR: ${email} -> ${otp}\n`);
 
             return res.status(200).json({ message: "OTP generated. Check terminal." });
         }
@@ -69,7 +70,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// STEP 3: VERIFY OTP
+// STEP 3: VERIFY OTP (Validates static code and returns JWT token)
 router.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
@@ -80,6 +81,7 @@ router.post('/verify-otp', async (req, res) => {
             user.otpExpires = null;
             await user.save();
 
+            // Uses the top-level jwt import variable
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
             res.status(200).json({ message: "Login verified!", token });
