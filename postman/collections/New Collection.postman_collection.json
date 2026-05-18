@@ -1,0 +1,516 @@
+{
+  "info": {
+    "_postman_id": "da1886bc-1088-4f1e-8dbc-ff5d78511cc2",
+    "name": "Aquasense AI API F",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "https://aquasense-ai-api.onrender.com/health",
+      "id": "fe87a777-f4aa-4bf6-b765-8271f5dbc183",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/health",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/users/register",
+      "id": "28c92843-6f1f-40eb-a03d-b86e4f88d508",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"Fides\",\r\n  \"email\": \"njerinjuguna943@gmail.com\",\r\n  \"password\": \"njeri8660\",\r\n  \"full_name\": \"Fides Njeri\",\r\n  \"organization_type\": \"pharmaceutical\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/users/register",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "users",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/users/login",
+      "id": "13ae67ca-271f-4a1f-b3a0-4193fb9a0f85",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"njerinjuguna943@gmail.com\",\r\n  \"password\": \"njeri8660\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/users/login",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/users/verify-otp",
+      "id": "1a24b96b-b7dc-4d32-91c2-a679b717ad04",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"njerinjuguna943@gmail.com\",\r\n  \"otp\": \"676000\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/users/verify-otp",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "users",
+            "verify-otp"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/users/forgot-password",
+      "id": "18b423df-0a75-487f-818f-62f3c5208c3f",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"njerinjuguna943@gmail.com\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/users/forgot-password",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "users",
+            "forgot-password"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/users/reset-password",
+      "id": "632d8f24-aa82-4f3a-a7d9-2bb5d6420f33",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"token\": \"Test email\",\r\n  \"newPassword\": \"YourNewPassword123\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/users/reset-password",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "users",
+            "reset-password"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/users/profile",
+      "id": "c7e2bd04-31c7-4fb2-8d16-9902dcd0b0a1",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzcyMTkzNTQzLCJleHAiOjE3NzIyNzk5NDN9.OStqJvV8ak9vbjK-JWOrLvPJDkVfS-GSvdIwSRuu278",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/users/profile",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "users",
+            "profile"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/sensors/register",
+      "id": "8dacc6c7-9287-4cdb-aeaa-c3e5824324bb",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzcyMTkzNTQzLCJleHAiOjE3NzIyNzk5NDN9.OStqJvV8ak9vbjK-JWOrLvPJDkVfS-GSvdIwSRuu278",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"sensor_name\": \"Main Borehole\",\r\n  \"location\": \"Building A\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/sensors/register",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "sensors",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/sensors/my-sensors",
+      "id": "451db8d9-e947-4f6d-9dd2-0c963c52cca5",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzcyMTkzNTQzLCJleHAiOjE3NzIyNzk5NDN9.OStqJvV8ak9vbjK-JWOrLvPJDkVfS-GSvdIwSRuu278",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/sensors/my-sensors",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "sensors",
+            "my-sensors"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/sensors/analytics/1",
+      "id": "27980438-9a18-478f-a893-7ae32827d923",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzcyMTkzNTQzLCJleHAiOjE3NzIyNzk5NDN9.OStqJvV8ak9vbjK-JWOrLvPJDkVfS-GSvdIwSRuu278",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/sensors/analytics/1",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "sensors",
+            "analytics",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/readings/upload",
+      "id": "d0dda709-c48c-4883-8c25-11dceaff47a0",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"api_key\": \"AQ-645db9bebbf9249e41d44af340dd512b653bdc3121fa6b4a755311919364bd4c\",\r\n  \"ph\": 6.2,\r\n  \"turbidity\": 12,\r\n  \"temperature\": 24,\r\n  \"dissolved_oxygen\": 4.8,\r\n  \"tds\": 350,\r\n  \"flow_rate\": 2.5\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/readings/upload",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "readings",
+            "upload"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/readings/sensor/1",
+      "id": "91f2bfdb-8e4c-401a-8c98-32adc2ccb314",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzcyMTkzNTQzLCJleHAiOjE3NzIyNzk5NDN9.OStqJvV8ak9vbjK-JWOrLvPJDkVfS-GSvdIwSRuu278",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/readings/sensor/1",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "readings",
+            "sensor",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/alerts/my-alerts",
+      "id": "a50da9f5-b3ba-495d-bc48-089696f50673",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzcyMTkzNTQzLCJleHAiOjE3NzIyNzk5NDN9.OStqJvV8ak9vbjK-JWOrLvPJDkVfS-GSvdIwSRuu278",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/alerts/my-alerts",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "alerts",
+            "my-alerts"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/alerts/resolve/1\n",
+      "id": "b5e9cdd7-a3ea-47a4-97b1-12395f68536b",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzcyMTkzNTQzLCJleHAiOjE3NzIyNzk5NDN9.OStqJvV8ak9vbjK-JWOrLvPJDkVfS-GSvdIwSRuu278",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/alerts/resolve/1\n",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "alerts",
+            "resolve",
+            "1\n"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "https://aquasense-ai-api.onrender.com/api/ai/analyze",
+      "id": "ee29291f-d3e6-4d11-aea6-b732b6e2db03",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzcyMTkzNTQzLCJleHAiOjE3NzIyNzk5NDN9.OStqJvV8ak9vbjK-JWOrLvPJDkVfS-GSvdIwSRuu278",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"ph\": 6.2,\r\n  \"turbidity\": 12,\r\n  \"temperature\": 24,\r\n  \"dissolved_oxygen\": 4.8\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://aquasense-ai-api.onrender.com/api/ai/analyze",
+          "protocol": "https",
+          "host": [
+            "aquasense-ai-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "ai",
+            "analyze"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

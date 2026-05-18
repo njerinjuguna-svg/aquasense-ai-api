@@ -1,37 +1,72 @@
+const express = require('express');
+const router = express.Router();
+const User = require('../models/model users');
 const jwt = require('jsonwebtoken');
 
-const protect = (req, res, next) => {
-    // 🔥 Fail fast if misconfigured
-    if (!process.env.JWT_SECRET) {
-        console.error('❌ JWT_SECRET is not defined');
-        return res.status(500).json({ message: 'Server misconfiguration' });
-    }
+// STEP 1: LOGIN (Credentials Check & OTP Generation)
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ where: { email } });
 
-    let token;
+        // Verify user exists and password is correct
+        if (user && (await user.matchPassword(password))) {
+            
+            // 1. Generate a random 6-digit OTP
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // 2. Set expiry (10 minutes from now)
+            const expires = new Date(Date.now() + 10 * 60 * 1000);
 
-    // 1. Check Authorization header
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer ')
-    ) {
-        try {
-            token = req.headers.authorization.split(' ')[1];
+            // 3. Save to Postgres
+            user.otp = otp;
+            user.otpExpires = expires;
+            await user.save();
 
-            // 2. Verify token (NO FALLBACKS)
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            // 4. LOG TO TERMINAL (Since we aren't using an Email API yet)
+            console.log(`\n--------------------------`);
+            console.log(`🔑 LOGIN OTP FOR: ${email}`);
+            console.log(`CODE: ${otp}`);
+            console.log(`--------------------------\n`);
 
-            // 3. Attach decoded payload
-            req.user = decoded;
-
-            return next();
-        } catch (error) {
-            console.error('❌ Token verification failed:', error.message);
-            return res.status(401).json({ message: 'Not authorized, token invalid' });
+            return res.status(200).json({ 
+                message: "Step 1 Successful: OTP generated. Check terminal." 
+            });
         }
+
+        res.status(401).json({ message: "Invalid email or password" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
     }
+});
 
-    // 4. No token at all
-    return res.status(401).json({ message: 'Not authorized, no token provided' });
-};
+// STEP 2: VERIFY OTP (Identity Confirmation & JWT Issuance)
+router.post('/verify-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const user = await User.findOne({ where: { email, otp } });
 
-module.exports = { protect };
+        // Check if OTP matches and is not expired
+        if (user && user.otpExpires > new Date()) {
+            
+            // 1. Clear OTP so it can't be reused
+            user.otp = null;
+            user.otpExpires = null;
+            await user.save();
+
+            // 2. Generate the final JWT for the session
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+            res.status(200).json({
+                message: "Login verified!",
+                token: token
+            });
+        } else {
+            res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Verification error", error: error.message });
+    }
+});
+
+module.exports = router;
