@@ -1,27 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/model users');
-const jwt = require('jsonwebtoken'); // <-- Kept exactly at the top of the route
+const jwt = require('jsonwebtoken'); // Kept right here at the top
 const bcrypt = require('bcryptjs');
 
-// STEP 1: REGISTER (Checks duplicates, hashes password, and creates user)
+// STEP 1: REGISTER (Relies on model hooks to prevent double-hashing)
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password, full_name, organization_type } = req.body;
         
-        // Check if a user with that email already exists to prevent database validation crashes
+        // Check if user already exists
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
             return res.status(400).json({ message: "A user with this email already exists" });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        
+        // Pass the raw password directly. If your model hashes automatically, this prevents a double-hash crash.
         const newUser = await User.create({
             username, 
             email, 
-            password: hashedPassword, 
+            password: password, // Sending raw password to let model hooks run cleanly
             full_name, 
             organization_type
         });
@@ -32,7 +30,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// STEP 2: LOGIN (Credentials Verification & OTP Generation)
+// STEP 2: LOGIN (Robust fallbacks for both direct hashes and instance methods)
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -42,8 +40,15 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
-        // Uses direct bcrypt comparison to match the registration password flow
-        const isMatch = await bcrypt.compare(password, user.password);
+        let isMatch = false;
+
+        // Fallback Check 1: Try using the model's instance method if it exists
+        if (typeof user.matchPassword === 'function') {
+            isMatch = await user.matchPassword(password);
+        } else {
+            // Fallback Check 2: Direct bcrypt comparison against the database string
+            isMatch = await bcrypt.compare(password, user.password);
+        }
 
         if (isMatch) {
             const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -75,7 +80,6 @@ router.post('/verify-otp', async (req, res) => {
             user.otpExpires = null;
             await user.save();
 
-            // Uses the top-level jwt import variable
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
             res.status(200).json({ message: "Login verified!", token });
