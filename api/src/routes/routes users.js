@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/model users');
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken'); // <-- Kept exactly where you want it!
+const bcrypt = require('bcryptjs');
 
 // STEP 1: REGISTER (Securely hashes password and creates user)
 router.post('/register', async (req, res) => {
