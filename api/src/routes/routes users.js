@@ -104,31 +104,40 @@ router.post('/verify-otp', async (req, res) => {
 });
 
 // ==========================================
-// STEP 4: GET USER PROFILE (Adjusted for flexible middleware matching)
+// STEP 4: GET USER PROFILE (Direct verification fallback)
 // URL: GET https://aquasense-ai-api.onrender.com/api/users/profile
 // ==========================================
 router.get('/profile', protect, async (req, res) => {
     try {
-        // 1. Check if the middleware attached the full user object under lowercase or capital names
+        // 1. Check if the middleware already attached it somewhere
         let currentUser = req.user || req.User;
 
-        // 2. If the middleware only attached a userId, fetch the full user from the database directly
-        if (!currentUser && (req.userId || req.UserId)) {
-            const idToQuery = req.userId || req.UserId;
-            currentUser = await User.findByPk(idToQuery, {
-                attributes: { exclude: ['password', 'otp', 'otpExpires'] } // Hide sensitive fields
-            });
+        // 2. If middleware failed to attach the user, read the token directly from the headers ourselves
+        if (!currentUser && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            try {
+                // Split the word 'Bearer' away to get just the token string
+                const token = req.headers.authorization.split(' ')[1].replace(/['"]+/g, ''); // Removes any accidental quotes
+                
+                // Decode the token using your environment secret
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                
+                // Fetch the full user from the database using the ID hidden inside the token
+                currentUser = await User.findByPk(decoded.id, {
+                    attributes: { exclude: ['password', 'otp', 'otpExpires'] }
+                });
+            } catch (jwtError) {
+                return res.status(401).json({ message: "Token verification failed inside route", error: jwtError.message });
+            }
         }
 
-        // 3. Fallback check if absolutely nothing was passed from the middleware
+        // 3. Final safety check
         if (!currentUser) {
             return res.status(404).json({ 
-                message: "User profile data not found. Check authMiddleware assignment keys.",
-                debugKeysReceived: Object.keys(req) // Helps us see exactly what your middleware is passing
+                message: "User profile data not found. Ensure the token belongs to an active database record." 
             });
         }
 
-        // 4. Return the clean user profile object
+        // 4. Return the user profile data
         res.status(200).json(currentUser);
 
     } catch (error) {
