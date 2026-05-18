@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/model users');
-const jwt = require('jsonwebtoken'); // Kept at the top
+const jwt = require('jsonwebtoken'); // <-- Kept exactly at the top of the route file
 const bcrypt = require('bcryptjs');
+const protect = require('../middleware/authMiddleware'); // Middleware to secure the profile route
 
-// STEP 1: REGISTER (Checks duplicates and creates user)
+// ==========================================
+// STEP 1: REGISTER NEW USER
+// URL: POST https://aquasense-ai-api.onrender.com/api/users/register
+// ==========================================
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password, full_name, organization_type } = req.body;
         
-        // Check if user already exists
+        // Intercept duplicates early to avoid database validation crashes
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
             return res.status(400).json({ message: "A user with this email already exists" });
@@ -30,7 +34,10 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// ==========================================
 // STEP 2: LOGIN (Credentials Check & Static OTP Setting)
+// URL: POST https://aquasense-ai-api.onrender.com/api/users/login
+// ==========================================
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -51,7 +58,7 @@ router.post('/login', async (req, res) => {
         }
 
         if (isMatch) {
-            // Hardcoded to '000000' for development ease
+            // Set static code to '000000' for seamless frontend testing
             const otp = "000000";
             const expires = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -70,7 +77,10 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// STEP 3: VERIFY OTP (Validates static code and returns JWT token)
+// ==========================================
+// STEP 3: VERIFY OTP (Validates static 000000 and returns production JWT token)
+// URL: POST https://aquasense-ai-api.onrender.com/api/users/verify-otp
+// ==========================================
 router.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
@@ -81,7 +91,7 @@ router.post('/verify-otp', async (req, res) => {
             user.otpExpires = null;
             await user.save();
 
-            // Uses the top-level jwt import variable
+            // Sign and hand back the production access token
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
             res.status(200).json({ message: "Login verified!", token });
@@ -90,6 +100,22 @@ router.post('/verify-otp', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ message: "Verification error", error: error.message });
+    }
+});
+
+// ==========================================
+// STEP 4: GET USER PROFILE
+// URL: GET https://aquasense-ai-api.onrender.com/api/users/profile
+// ==========================================
+router.get('/profile', protect, async (req, res) => {
+    try {
+        // Since protect middleware attaches the user instance to req.user, we return it directly
+        if (!req.user) {
+            return res.status(404).json({ message: "User profile data not found" });
+        }
+        res.status(200).json(req.user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error fetching profile", error: error.message });
     }
 });
 
